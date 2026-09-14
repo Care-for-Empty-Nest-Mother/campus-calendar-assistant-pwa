@@ -1,18 +1,22 @@
 name: Deploy PWA to GitHub Pages
 
+
 on:
   push:
     branches: [main]
   workflow_dispatch:
+
 
 permissions:
   contents: read
   pages: write
   id-token: write
 
+
 concurrency:
   group: pages
   cancel-in-progress: true
+
 
 jobs:
   build:
@@ -22,7 +26,7 @@ jobs:
       - name: Extract PWA
         run: |
           mkdir -p dist
-          unzip -q pwa-site-v1.5.zip -d dist
+          unzip -q pwa-site-v1.5.1.zip -d dist
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
@@ -34,6 +38,3 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
