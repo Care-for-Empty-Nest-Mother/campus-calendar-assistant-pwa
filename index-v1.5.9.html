@@ -526,7 +526,7 @@ body.preview-mode .preview-only{display:block}
       </div>
       <div class="btn-row extract-actions">
         <button class="btn" id="clipboardExtractBtn">从剪贴板识别</button>
-        <a class="btn primary" id="installIosShortcutBtn" href="extract-course-v3.shortcut">一键安装“提取课表”快捷指令</a>
+        <a class="btn primary" id="installIosShortcutBtn" href="extract-course-v4.shortcut">一键安装“提取课表”快捷指令</a>
         <button class="btn" id="copyScriptBtn">复制一键提取书签</button>
         <button class="btn" id="copyIosShortcutBtn">复制快捷指令脚本</button>
       </div>
@@ -1857,7 +1857,7 @@ function scrapeSnippet(importBase){
 function shortcutTableCoreSnippet(){
   return "var docs=[document];try{document.querySelectorAll('iframe').forEach(function(f){try{var d=f.contentDocument;if(d&&d.body&&docs.indexOf(d)<0)docs.push(d);}catch(e){}});for(var j=0;j<window.frames.length;j++){try{var d=window.frames[j].document;if(d&&d.body&&docs.indexOf(d)<0)docs.push(d);}catch(e){}}}catch(e){}" +
     "var best=null,score=-1;docs.forEach(function(d){d.querySelectorAll('table').forEach(function(t){var x=t.textContent||'',s=0;if(/[一二三四五六日天]/.test(x)&&/周|星期|节/.test(x))s+=3;if(/星期[一二三四五六日天]/.test(x))s+=1;s+=Math.min(4,(x.match(/周/g)||[]).length/6)+Math.min(3,(x.match(/节/g)||[]).length/8);if(t.rows&&t.rows.length>=5)s+=1;if(s>score){score=s;best=t;}});});" +
-    "if(!best||score<3)return null;var out=[],rs=best.rows;for(var i=0;i<rs.length;i++){var row=[],cs=rs[i].cells;for(var k=0;k<cs.length;k++){var c=cs[k];row.push({t:(c.innerText||c.textContent||'').replace(/\r/g,'').trim(),rs:c.rowSpan||1,cs:c.colSpan||1});}out.push(row);}return JSON.stringify({type:'xpu-course-table',title:document.title,url:location.href,rows:out});";
+    "if(!best||score<3)return null;var out=[],rs=best.rows;for(var i=0;i<rs.length;i++){var row=[],cs=rs[i].cells;for(var k=0;k<cs.length;k++){var c=cs[k];row.push({t:(c.innerText||c.textContent||'').trim(),rs:c.rowSpan||1,cs:c.colSpan||1});}out.push(row);}return JSON.stringify({type:'xpu-course-table',title:document.title,url:location.href,rows:out});";
 }
 function shortcutSnippet(importBase){
   const root = importBase.replace(/#import=.*$/, '');
