@@ -29,7 +29,7 @@ h1{font-size:20px;margin:0 0 10px}p{color:#6e6e73;line-height:1.6}.ver{font-weig
       await Promise.all(keys.map(k=>caches.delete(k)));
     }
     status.textContent='更新完成，正在打开最新版…';
-    location.replace('./?v='+Date.now());
+    location.replace('https://care-for-empty-nest-mother.github.io/campus-calendar-assistant-pwa/?v='+Date.now());
   }catch(e){
     status.textContent='自动更新失败：'+(e.message||e)+'。请手动重新打开校历小助手。';
   }
