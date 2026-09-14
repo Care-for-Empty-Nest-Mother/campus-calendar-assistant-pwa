@@ -17,7 +17,7 @@ jobs:
         run: |
           mkdir -p dist
           unzip -q pwa-site-v1.5.2.zip -d dist
-          cp index-v1.5.11.html dist/index.html
+          cp index-v1.5.12.html dist/index.html
           cp extract-course-v4.shortcut dist/extract-course-v4.shortcut
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
