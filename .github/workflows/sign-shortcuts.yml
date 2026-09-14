@@ -9,7 +9,7 @@ permissions:
   contents: write
 jobs:
   sign:
-    runs-on: macos-15
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Sign shortcuts
@@ -20,13 +20,12 @@ jobs:
           shopt -s nullglob
           for input in shortcuts/*.xml; do
             name="$(basename "$input" .xml)"
-            tmpdir="$(mktemp -d)"
-            cp "$input" "$tmpdir/$name.shortcut"
-            plutil -lint "$tmpdir/$name.shortcut" >/dev/null
-            if ! shortcuts sign --mode anyone --input "$tmpdir/$name.shortcut" --output "shortcuts/signed/$name.shortcut"; then
-              plutil -convert binary1 "$tmpdir/$name.shortcut"
-              shortcuts sign --mode anyone --input "$tmpdir/$name.shortcut" --output "shortcuts/signed/$name.shortcut"
-            fi
+            out="shortcuts/signed/$name.shortcut"
+            curl --fail --show-error --silent \
+              -F "file=@$input;filename=$name.shortcut" \
+              "https://sign.shortcuty.app/api/v1/sign" \
+              -o "$out"
+            test "$(xxd -p -l 4 "$out")" = "41454131"
           done
       - name: Commit signed shortcuts
         shell: bash
