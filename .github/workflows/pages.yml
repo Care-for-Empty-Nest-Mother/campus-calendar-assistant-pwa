@@ -22,7 +22,7 @@ jobs:
       - name: Extract PWA
         run: |
           mkdir -p dist
-          unzip -q pwa-site.zip -d dist
+          unzip -q pwa-site-v1.5.zip -d dist
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
