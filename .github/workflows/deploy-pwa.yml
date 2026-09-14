@@ -17,7 +17,7 @@ jobs:
         run: |
           mkdir -p dist
           unzip -q pwa-site-v1.5.2.zip -d dist
-          cp index-v1.5.3.html dist/index.html
+          cp index-v1.5.4.html dist/index.html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
