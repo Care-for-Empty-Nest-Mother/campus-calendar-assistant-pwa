@@ -1,0 +1,39 @@
+name: sign-shortcuts
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'shortcuts/*.xml'
+      - '.github/workflows/sign-shortcuts.yml'
+permissions:
+  contents: write
+jobs:
+  sign:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Sign shortcuts
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p shortcuts/signed
+          shopt -s nullglob
+          for input in shortcuts/*.xml; do
+            name="$(basename "$input" .xml)"
+            tmpdir="$(mktemp -d)"
+            cp "$input" "$tmpdir/$name.shortcut"
+            plutil -lint "$tmpdir/$name.shortcut" >/dev/null
+            if ! shortcuts sign --mode anyone --input "$tmpdir/$name.shortcut" --output "shortcuts/signed/$name.shortcut"; then
+              plutil -convert binary1 "$tmpdir/$name.shortcut"
+              shortcuts sign --mode anyone --input "$tmpdir/$name.shortcut" --output "shortcuts/signed/$name.shortcut"
+            fi
+          done
+      - name: Commit signed shortcuts
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add shortcuts/signed
+          git diff --cached --quiet && exit 0
+          git commit -m "Build signed iOS shortcuts"
+          git push
