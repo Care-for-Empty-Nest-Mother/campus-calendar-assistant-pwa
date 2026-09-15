@@ -2689,6 +2689,7 @@ function init(){
   $('#modal').addEventListener('click', ev => { if (ev.target.id === 'modal') closeModal('modal'); });
 
   /* 渲染与启动 */
+  if (new URLSearchParams(location.search).get('install') === '1') switchTab('courses');
   applyTheme();
   handleImportHash();
   normalizeStoredCourseSections();
