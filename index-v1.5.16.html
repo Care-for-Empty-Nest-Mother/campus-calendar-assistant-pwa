@@ -522,30 +522,23 @@ body.preview-mode .preview-only{display:block}
 
     <div class="card">
       <div class="card-head"><h2>教务系统</h2></div>
-      <p class="hint">PWA 无法直接读取教务系统登录后的页面。iPad/iPhone 推荐使用“苹果快捷指令”，在 Safari 分享菜单中一键提取；Android/电脑可使用一键书签。</p>
+      <p class="hint">iPad/iPhone 点下方“一键安装快捷指令”，以后在课表查询页通过 Safari 分享菜单运行即可。</p>
       <div class="url-row">
         <input id="urlInput" value="https://yjsjyjxgl.xsyu.edu.cn/gmis/student/default/index" placeholder="教务系统登录页网址">
         <button class="btn primary" id="nativeExtractBtn">打开教务系统</button>
       </div>
       <div class="btn-row extract-actions">
-        <button class="btn" id="clipboardExtractBtn">从剪贴板识别</button>
-        <a class="btn" id="installIosShortcutBtn" href="extract-course-v5-unsigned.zip" download="extract-course-v5-unsigned.zip">下载 v5 待签名包（备用）</a>
-        <a class="btn" id="signHelperIosBtn" href="https://routinehub.co/shortcut/26044/" target="_blank" rel="noopener">先安装签名助手</a>
-        <button class="btn" id="copyScriptBtn">复制一键提取书签</button>
-        <button class="btn primary" id="copyIosShortcutBtn">复制 v5 修复脚本（推荐）</button>
+        <a class="btn primary" id="installIosShortcutBtn" href="shortcuts://import-shortcut/?url=https%3A%2F%2Fcdn.jsdelivr.net%2Fgh%2FCare-for-Empty-Nest-Mother%2Fcampus-calendar-assistant-pwa%40main%2Fextract-course-v5.shortcut&name=%E6%A0%A1%E5%8E%86%E5%B0%8F%E5%8A%A9%E6%89%8B%C2%B7%E6%8F%90%E5%8F%96%E8%AF%BE%E8%A1%A8%20v5">一键安装快捷指令</a>
       </div>
       <details id="iosShortcutGuide" open>
-        <summary>iPad / iPhone 一键提取设置</summary>
+        <summary>安装后使用方法</summary>
         <ol class="web-steps">
-          <li><b>推荐修复：</b>点“复制 v5 修复脚本”。打开“快捷指令”App→旧快捷指令“校历小助手·提取课表”→编辑→打开“在网页上运行 JavaScript”动作→全选旧脚本并粘贴，保存即可，不需要重新签名。</li><li><b>备用方案：</b>先安装签名助手，再下载 v5 待签名包；在“文件”App 解压后运行签名助手，选择“extract-course-v5.shortcut”，把签名后的 v5 加入快捷指令。</li>
-          <li>首次使用请在“设置→快捷指令”中开启“允许运行脚本”。这是 Apple 不允许应用代为开启的系统权限。</li>
-          <li>登录教务系统，进入“培养管理→学生课表查询”，确认表格已显示；再点 Safari“分享”→“提取课表”自动导入。</li>
+          <li>点“一键安装快捷指令”，在系统弹窗中选择“添加快捷指令”。</li>
+          <li>如果已有旧版“校历小助手·提取课表”，先删除旧版，避免冲突。</li>
+          <li>登录教务系统，在课表查询页点 Safari“分享”→“校历小助手·提取课表 v5”。</li>
         </ol>
-        <p class="hint">若页面版本不是最新版，请先打开 <a href="force-update.html?x=1516">清理缓存更新页</a>。日历、提醒等权限会在首次实际写入时由系统自动询问。</p>
-        <div id="iosShortcutMsg"></div>
+        <p class="hint">首次运行如提示脚本权限，请到“设置 → 快捷指令”开启“允许运行脚本”。</p>
       </details>
-      <div class="paste-zone" id="pasteZone" contenteditable="true" data-ph="也可以在这里直接粘贴从教务课表页复制的内容"></div>
-      <p class="hint">Android/电脑：安装一键提取书签后，在教务课表页点击书签，会直接完成课表导入。</p>
       <div id="htmlMsg"></div>
       <div id="htmlPreview"></div>
     </div>
