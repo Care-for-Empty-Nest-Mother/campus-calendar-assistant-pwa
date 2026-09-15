@@ -536,11 +536,11 @@ body.preview-mode .preview-only{display:block}
       <details id="iosShortcutGuide" open>
         <summary>iPad / iPhone 一键提取设置</summary>
         <ol class="web-steps">
-          <li>点“一键安装提取课表快捷指令”，再点系统弹窗中的“添加快捷指令”。</li>
+          <li>若之前安装过旧版，请先在“快捷指令”App 中删除旧快捷指令；再点本页“一键安装提取课表快捷指令”，选择“添加快捷指令”。</li>
           <li>首次使用请在“设置→快捷指令”中开启“允许运行脚本”。这是 Apple 不允许应用代为开启的系统权限。</li>
-          <li>登录教务系统并进入课表查询页，点 Safari“分享”→“提取课表”即可自动导入。</li>
+          <li>登录教务系统，进入“培养管理→学生课表查询”，确认表格已显示；再点 Safari“分享”→“提取课表”自动导入。</li>
         </ol>
-        <p class="hint">日历、提醒等权限会在首次实际写入时由系统自动询问。若快捷指令无法导入，可点“复制快捷指令脚本”备用，或使用下方的短书签。</p>
+        <p class="hint">若页面版本不是最新版，请先打开 <a href="force-update.html?x=1516">清理缓存更新页</a>。日历、提醒等权限会在首次实际写入时由系统自动询问。</p>
         <div id="iosShortcutMsg"></div>
       </details>
       <div class="paste-zone" id="pasteZone" contenteditable="true" data-ph="也可以在这里直接粘贴从教务课表页复制的内容"></div>
@@ -1542,7 +1542,7 @@ function openHtmlPreview(parsed, sourceLabel){
   if (!parsed.courses.length){
     box.innerHTML = '<div class="pv-none">未能从内容中识别出课程' +
       (parsed.warnings.length ? '（' + esc(parsed.warnings.join('；')) + '）' : '') +
-      '。建议改用「复制提取脚本」方式，或确认复制的是课表页面内容。</div>';
+      '。若正在使用苹果快捷指令，请删除旧快捷指令并从本页重新安装 v4；否则请确认是在“学生课表查询”表格已经显示后提取。</div>';
     return;
   }
   const dayOpts = d => '<option value="0"' + (d === 0 ? ' selected' : '') + '>忽略</option>' +
@@ -1891,9 +1891,13 @@ function handleImportHash(){
     const payload = new TextDecoder().decode(bytes);
     let info = null;
     try { info = JSON.parse(payload); } catch(e){}
-    const isCompactTable = prefix === tablePrefix && info && info.type === 'xpu-course-table';
+    const isCompactTable = !!(info && Array.isArray(info.rows));
     const src = isCompactTable ? '' : (info && info.html ? info.html : payload);
-    const parsed = isCompactTable ? parseCompactTable(info) : parseHtmlCourses(src);
+    let parsed = isCompactTable ? parseCompactTable(info) : parseHtmlCourses(src);
+    if (isCompactTable && !parsed.courses.length){
+      const compactHtml = parseHtmlCourses(compactTableToHtml(info));
+      if (compactHtml.courses.length) parsed = compactHtml;
+    }
     const n = autoImportParsed(parsed, info ? { sourceTitle: info.title || '', sourceUrl: info.url || '' } : null);
     switchTab('courses');
     if (n){
@@ -1904,11 +1908,12 @@ function handleImportHash(){
       if (skipped) openHtmlPreview(parsed, '提取脚本数据（已自动导入 ' + n + ' 门）');
       toast('课表已自动导入：' + n + ' 门课程');
     } else {
-      const isTablePayload = prefix === tablePrefix && info && info.type === 'xpu-course-table';
-      const rowCount = isTablePayload && Array.isArray(info.rows) ? info.rows.length : 0;
+      const isTablePayload = !!(info && Array.isArray(info.rows));
+      const rowCount = isTablePayload ? info.rows.length : 0;
+      const legacyShortcut = !!(info && info.type === 'xpu-course-html');
       $('#htmlMsg').innerHTML = isTablePayload
         ? '<div class="err">已收到 ' + rowCount + ' 行表格数据，但自动识别未完成。请核对下方内容并把星期、节次修正后导入。</div>'
-        : '';
+        : (legacyShortcut ? '<div class="err">检测到旧版快捷指令数据。请先在“快捷指令”App 删除旧版，再从课表导入页重新安装 v4 后重试。</div>' : '');
       openHtmlPreview(parsed, isTablePayload ? '快捷指令数据' : '提取脚本数据');
       requestAnimationFrame(() => {
         const box = $('#htmlPreview');
