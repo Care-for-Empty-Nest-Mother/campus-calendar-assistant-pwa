@@ -529,15 +529,15 @@ body.preview-mode .preview-only{display:block}
       </div>
       <div class="btn-row extract-actions">
         <button class="btn" id="clipboardExtractBtn">从剪贴板识别</button>
-        <a class="btn primary" id="installIosShortcutBtn" href="extract-course-v5-unsigned.zip" download="extract-course-v5-unsigned.zip">下载 v5 待签名安装包</a>
+        <a class="btn" id="installIosShortcutBtn" href="extract-course-v5-unsigned.zip" download="extract-course-v5-unsigned.zip">下载 v5 待签名包（备用）</a>
         <a class="btn" id="signHelperIosBtn" href="https://routinehub.co/shortcut/26044/" target="_blank" rel="noopener">先安装签名助手</a>
         <button class="btn" id="copyScriptBtn">复制一键提取书签</button>
-        <button class="btn" id="copyIosShortcutBtn">复制快捷指令脚本</button>
+        <button class="btn primary" id="copyIosShortcutBtn">复制 v5 修复脚本（推荐）</button>
       </div>
       <details id="iosShortcutGuide" open>
         <summary>iPad / iPhone 一键提取设置</summary>
         <ol class="web-steps">
-          <li>v5 安装步骤：<ol style="margin:6px 0 0 18px;padding:0"><li>点“先安装签名助手”，在 RoutineHub 页面点“Get Shortcut”，把签名助手加入“快捷指令”App。</li><li>点“下载 v5 待签名安装包”，在“文件”App→“下载”中解压。</li><li>运行签名助手，选择解压出的“extract-course-v5.shortcut”，等待签名完成。</li><li>删除旧的“校历小助手·提取课表”，把新签名的 v5 加入快捷指令。</li></ol></li>
+          <li><b>推荐修复：</b>点“复制 v5 修复脚本”。打开“快捷指令”App→旧快捷指令“校历小助手·提取课表”→编辑→打开“在网页上运行 JavaScript”动作→全选旧脚本并粘贴，保存即可，不需要重新签名。</li><li><b>备用方案：</b>先安装签名助手，再下载 v5 待签名包；在“文件”App 解压后运行签名助手，选择“extract-course-v5.shortcut”，把签名后的 v5 加入快捷指令。</li>
           <li>首次使用请在“设置→快捷指令”中开启“允许运行脚本”。这是 Apple 不允许应用代为开启的系统权限。</li>
           <li>登录教务系统，进入“培养管理→学生课表查询”，确认表格已显示；再点 Safari“分享”→“提取课表”自动导入。</li>
         </ol>
@@ -1977,8 +1977,7 @@ function shortcutTableCoreSnippet(){
     "if(!best||score<3)return null;var out=[],rs=best.rows;for(var i=0;i<rs.length;i++){var row=[],cs=rs[i].cells;for(var k=0;k<cs.length;k++){var c=cs[k];row.push({t:(c.innerText||c.textContent||'').trim(),rs:c.rowSpan||1,cs:c.colSpan||1});}out.push(row);}return JSON.stringify({type:'xpu-course-table',title:document.title,url:location.href,rows:out});";
 }
 function shortcutSnippet(importBase){
-  const root = importBase.replace(/#import=.*$/, '');
-  return "(function(){try{var p=(function(){" + shortcutTableCoreSnippet() + "})();if(!p){completion(" + JSON.stringify(root) + "+'#importerror='+encodeURIComponent('未找到课表，请先打开课表查询页面'));return;}var b=new TextEncoder().encode(p),q='';for(var i=0;i<b.length;i++)q+=String.fromCharCode(b[i]);completion(" + JSON.stringify(root) + "+'#importtable='+btoa(q).replace(/\\+/g,'-').replace(/\\//g,'_').replace(/=+$/,''));}catch(e){completion(" + JSON.stringify(root) + "+'#importerror='+encodeURIComponent('提取失败：'+e));}})();";
+  return "(function(){try{\nvar BASE=\"https://care-for-empty-nest-mother.github.io/campus-calendar-assistant-pwa/\";\nfunction done(url){completion(BASE+url);}\nfunction fail(msg){done('#importerror='+encodeURIComponent(String(msg||'未知错误')));}\nfunction pack(obj){\n  var p=JSON.stringify(obj),b=new TextEncoder().encode(p),q='';\n  for(var i=0;i<b.length;i++)q+=String.fromCharCode(b[i]);\n  return '#importtable='+btoa(q).replace(/\\+/g,'-').replace(/\\//g,'_').replace(/=+$/,'');\n}\nfunction scoreTable(t){\n  var x=t.textContent||'',s=0;\n  if(/[一二三四五六日天]/.test(x)&&/周|星期|节/.test(x))s+=3;\n  if(/星期[一二三四五六日天]/.test(x))s+=1;\n  s+=Math.min(4,Math.floor((x.match(/周/g)||[]).length/6));\n  s+=Math.min(3,Math.floor((x.match(/节/g)||[]).length/8));\n  if(t.rows&&t.rows.length>=5)s+=1;\n  return s;\n}\nfunction findTable(doc){\n  var t=doc.querySelector('table#kb')||doc.querySelector('table.curriculum');\n  if(t)return t;\n  var best=null,score=-1,all=doc.querySelectorAll('table');\n  for(var i=0;i<all.length;i++){\n    var s=scoreTable(all[i]);\n    if(s>score){score=s;best=all[i];}\n  }\n  return best&&score>=3?best:null;\n}\nfunction findCourseUrl(){\n  var links=document.querySelectorAll('a[href]');\n  for(var i=0;i<links.length;i++){\n    var a=links[i],href=a.getAttribute('href')||'',txt=(a.textContent||'').replace(/\\s/g,'');\n    if(/xskbcx/i.test(href)||txt.indexOf('学生课表查询')>=0){\n      var u=a.href||href;\n      if(u&&u.indexOf('javascript:')!==0)return u;\n    }\n  }\n  var f=document.querySelector('#mainFrame')||document.querySelector('iframe[name=\"mainFrame\"]');\n  if(f&&f.src&&!/(^|\\/)home(?:\\?|#|$)/i.test(f.src))return f.src;\n  return '';\n}\nvar table=findTable(document),src=location.href;\nif(!table){\n  var url=findCourseUrl();\n  if(!url){\n    fail('未找到“学生课表查询”入口，请先登录教务系统并打开培养管理菜单');\n    return;\n  }\n  var xhr=new XMLHttpRequest();\n  xhr.open('GET',url,false);\n  xhr.withCredentials=true;\n  try{xhr.send(null);}catch(e){fail('课表页面请求失败：'+e);return;}\n  if(xhr.status<200||xhr.status>=400){fail('课表页面请求失败：HTTP '+xhr.status);return;}\n  var doc=new DOMParser().parseFromString(xhr.responseText,'text/html');\n  table=findTable(doc);src=url;\n}\nif(!table){fail('已获取页面，但没有找到课表表格#kb');return;}\nvar out=[],rows=table.rows;\nfor(var r=0;r<rows.length;r++){\n  var row=[],cells=rows[r].cells;\n  for(var c=0;c<cells.length;c++){\n    var cell=cells[c];\n    row.push({t:(cell.innerText||cell.textContent||'').trim(),rs:cell.rowSpan||1,cs:cell.colSpan||1});\n  }\n  out.push(row);\n}\ndone(pack({type:'xpu-course-table',title:document.title,url:src,rows:out}));\n}catch(e){completion(\"https://care-for-empty-nest-mother.github.io/campus-calendar-assistant-pwa/#importerror=\"+encodeURIComponent('提取失败：'+e));}})();";
 }
 async function copyText(text){
   let ok = false;
@@ -2000,10 +1999,10 @@ async function copyIosShortcutScript(){
   const script = shortcutSnippet(importBaseUrl());
   const ok = await copyText(script);
   if (ok){
-    msg.innerHTML = '<div class="ok"><b>苹果快捷指令脚本已复制。</b><br>请按上方步骤粘贴到“在网页上运行 JavaScript”操作中。</div><details><summary>剪贴板没有内容？点此显示完整脚本</summary><textarea class="manual-copy" readonly>' + esc(script) + '</textarea></details>';
+    msg.innerHTML = '<div class="ok"><b>v5 修复脚本已复制。</b><br>请打开快捷指令 App→“校历小助手·提取课表”→编辑→打开“在网页上运行 JavaScript”动作，全选旧脚本后粘贴并保存。</div><details><summary>剪贴板没有内容？点此显示完整脚本</summary><textarea class="manual-copy" readonly>' + esc(script) + '</textarea></details>';
     toast('苹果快捷指令脚本已复制');
   } else {
-    msg.innerHTML = '<div class="err">自动复制失败，请长按下方文本手动复制：</div><textarea class="manual-copy" readonly>' + esc(script) + '</textarea>';
+    msg.innerHTML = '<div class="err">自动复制失败，请长按下方文本全选复制，然后替换快捷指令中的旧 JavaScript：</div><textarea class="manual-copy" readonly>' + esc(script) + '</textarea>';
   }
 }
 
