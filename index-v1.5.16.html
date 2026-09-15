@@ -2554,6 +2554,7 @@ function init(){
   const iosShortcutBtn = $('#copyIosShortcutBtn');
   if (iosShortcutBtn) iosShortcutBtn.onclick = copyIosShortcutScript;
   if (/iPad|iPhone|iPod/.test(navigator.userAgent)){ const guide = $('#iosShortcutGuide'); if (guide) guide.open = true; }
+  prepareIosShortcutDownload();
   const pasteZone = $('#pasteZone');
   if (pasteZone) pasteZone.addEventListener('paste', e => {
     const cd = e.clipboardData;
