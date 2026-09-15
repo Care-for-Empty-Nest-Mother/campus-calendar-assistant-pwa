@@ -529,14 +529,15 @@ body.preview-mode .preview-only{display:block}
       </div>
       <div class="btn-row extract-actions">
         <button class="btn" id="clipboardExtractBtn">从剪贴板识别</button>
-        <a class="btn primary" id="installIosShortcutBtn" href="extract-course-v4.zip" download="extract-course-v4.zip">下载快捷指令安装包（推荐）</a>
+        <a class="btn primary" id="installIosShortcutBtn" href="extract-course-v5-unsigned.zip" download="extract-course-v5-unsigned.zip">下载 v5 待签名安装包</a>
+        <a class="btn" id="signHelperIosBtn" href="https://routinehub.co/shortcut/26044/" target="_blank" rel="noopener">先安装签名助手</a>
         <button class="btn" id="copyScriptBtn">复制一键提取书签</button>
         <button class="btn" id="copyIosShortcutBtn">复制快捷指令脚本</button>
       </div>
       <details id="iosShortcutGuide" open>
         <summary>iPad / iPhone 一键提取设置</summary>
         <ol class="web-steps">
-          <li>若之前安装过旧版，请先在“快捷指令”App 中删除旧快捷指令；再点“下载快捷指令安装包”。下载完成后，打开“文件”App →“下载”，点压缩包解压，再点里面的“extract-course-v4.shortcut”，选择“添加快捷指令”。</li>
+          <li>v5 安装步骤：<ol style="margin:6px 0 0 18px;padding:0"><li>点“先安装签名助手”，在 RoutineHub 页面点“Get Shortcut”，把签名助手加入“快捷指令”App。</li><li>点“下载 v5 待签名安装包”，在“文件”App→“下载”中解压。</li><li>运行签名助手，选择解压出的“extract-course-v5.shortcut”，等待签名完成。</li><li>删除旧的“校历小助手·提取课表”，把新签名的 v5 加入快捷指令。</li></ol></li>
           <li>首次使用请在“设置→快捷指令”中开启“允许运行脚本”。这是 Apple 不允许应用代为开启的系统权限。</li>
           <li>登录教务系统，进入“培养管理→学生课表查询”，确认表格已显示；再点 Safari“分享”→“提取课表”自动导入。</li>
         </ol>
