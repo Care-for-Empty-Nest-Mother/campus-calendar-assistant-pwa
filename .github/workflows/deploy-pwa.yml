@@ -20,6 +20,7 @@ jobs:
           cp index-v1.5.16.html dist/index.html
           cp extract-course-v4.shortcut dist/extract-course-v4.shortcut
           cp extract-course-v4.zip dist/extract-course-v4.zip
+          cp extract-course-v5-unsigned.zip dist/extract-course-v5-unsigned.zip
           cp force-update.html dist/force-update.html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
