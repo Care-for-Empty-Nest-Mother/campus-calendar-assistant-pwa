@@ -528,7 +528,7 @@ body.preview-mode .preview-only{display:block}
         <button class="btn primary" id="nativeExtractBtn">打开教务系统</button>
       </div>
       <div class="btn-row extract-actions">
-        <a class="btn primary" id="installIosShortcutBtn" href="shortcuts://import-shortcut/?url=https%3A%2F%2Fcdn.jsdelivr.net%2Fgh%2FCare-for-Empty-Nest-Mother%2Fcampus-calendar-assistant-pwa%40main%2Fextract-course-v5.shortcut&name=%E6%A0%A1%E5%8E%86%E5%B0%8F%E5%8A%A9%E6%89%8B%C2%B7%E6%8F%90%E5%8F%96%E8%AF%BE%E8%A1%A8%20v5">一键安装快捷指令</a>
+        <button class="btn primary" id="installIosShortcutBtn">一键安装快捷指令</button>
       </div>
       <details id="iosShortcutGuide" open>
         <summary>安装后使用方法</summary>
@@ -1985,6 +1985,29 @@ async function copyText(text){
   return ok;
 }
 
+async function installIosShortcut(){
+  const btn=$('#installIosShortcutBtn'); if(!btn) return;
+  const oldText=btn.textContent; btn.disabled=true; btn.textContent='正在准备…';
+  try{
+    const res=await fetch('extract-course-v5.shortcut?ts='+Date.now(),{cache:'no-store'});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const blob=new Blob([await res.arrayBuffer()],{type:'application/x-apple-shortcut'});
+    const file=new File([blob],'校历小助手-提取课表-v5.shortcut',{type:'application/x-apple-shortcut'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({files:[file],title:'校历小助手·提取课表 v5'});
+      btn.textContent='已打开安装面板';
+    }else{
+      const url=URL.createObjectURL(blob),a=document.createElement('a');
+      a.href=url; a.download=file.name; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),60000);
+      btn.textContent='已下载安装文件';
+    }
+  }catch(e){
+    btn.textContent='安装失败，点击重试';
+  }finally{
+    btn.disabled=false; setTimeout(()=>{if(btn.textContent!=='安装失败，点击重试')btn.textContent=oldText;},1800);
+  }
+}
 async function copyIosShortcutScript(){
   const msg = $('#iosShortcutMsg');
   const guide = $('#iosShortcutGuide');
@@ -2540,6 +2563,8 @@ function init(){
   if (copyScriptBtn) copyScriptBtn.onclick = copyScrapeScript;
   const iosShortcutBtn = $('#copyIosShortcutBtn');
   if (iosShortcutBtn) iosShortcutBtn.onclick = copyIosShortcutScript;
+  const installIosBtn = $('#installIosShortcutBtn');
+  if (installIosBtn) installIosBtn.onclick = installIosShortcut;
   if (/iPad|iPhone|iPod/.test(navigator.userAgent)){ const guide = $('#iosShortcutGuide'); if (guide) guide.open = true; }
   const pasteZone = $('#pasteZone');
   if (pasteZone) pasteZone.addEventListener('paste', e => {
