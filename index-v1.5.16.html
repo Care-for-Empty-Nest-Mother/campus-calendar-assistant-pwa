@@ -1985,6 +1985,19 @@ async function copyText(text){
   return ok;
 }
 
+async function prepareIosShortcutDownload(){
+  const a=$('#installIosShortcutBtn'); if(!a) return;
+  try{
+    const res=await fetch('extract-course-v5.shortcut?ts='+Date.now(),{cache:'no-store'});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const bytes=await res.arrayBuffer();
+    const h=new Uint8Array(bytes.slice(0,4));
+    if(h.length<4||h[0]!==0x41||h[1]!==0x45||h[2]!==0x41||h[3]!==0x31) throw new Error('invalid file');
+    const blob=new Blob([bytes],{type:'application/x-apple-shortcut'});
+    const url=URL.createObjectURL(blob);
+    a.href=url; a.download='extract-course-v5.shortcut'; a.dataset.ready='1';
+  }catch(e){}
+}
 async function copyIosShortcutScript(){
   const msg = $('#iosShortcutMsg');
   const guide = $('#iosShortcutGuide');
