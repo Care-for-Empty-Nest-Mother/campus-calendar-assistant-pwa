@@ -2160,7 +2160,7 @@ async function syncToIosCalendar(){
   const copied = await copyCalendarPayload(payload);
   if (!copied){ status.innerHTML = '<div class="err">无法复制日历数据，请允许浏览器访问剪贴板后重试。</div>'; return; }
   status.innerHTML = events.length ? ('已准备清除所选旧日程并写入 <b>' + events.length + '</b> 项日程，正在打开快捷指令…') : '已准备清除所选范围内的旧日程，正在打开快捷指令…';
-  const shortcutName = '校历小助手·同步系统日历 v2';
+  const shortcutName = 'calendar-sync-v2';
   location.href = 'shortcuts://run-shortcut?name=' + encodeURIComponent(shortcutName);
   setTimeout(() => { status.innerHTML = '若没有自动打开快捷指令，请先点下方安装链接，按页面提示完成 v2 快捷指令安装。'; }, 1500);
 }
