@@ -2,8 +2,8 @@ from pathlib import Path
 import plistlib
 
 ROOT = Path(__file__).resolve().parent
-OUT = ROOT / 'calendar-sync-v2.1.xml'
-SHORTCUT_NAME = 'calendar-sync-v2.1'
+OUT = ROOT / 'calendar-sync-v2.2.xml'
+SHORTCUT_NAME = 'calendar-sync-v2.2'
 
 GET_CLIP = 'B2C3D4E0-1111-4A00-8B5A-0F8E2D3C4970'
 TEXT = 'B2C3D4E1-2222-4B11-9C6B-10F9E3D4A081'
@@ -131,9 +131,8 @@ def add_event(uid, alert=None, all_day=False):
         'WFCalendarItemDates': True,
         'WFCalendarItemStartDate': output_text('开始', START),
         'WFCalendarItemAllDay': all_day,
-        'WFCalendarItemShowComposer': False,
-        'ShowComposeSheet': False,
-        'WFShowWhenRun': False,
+        # 当前 Shortcuts 格式使用 ShowWhenRun 控制是否弹出添加日程窗口。
+        'ShowWhenRun': False,
     }
     if not all_day:
         params['WFCalendarItemEndDate'] = output_text('结束', END)

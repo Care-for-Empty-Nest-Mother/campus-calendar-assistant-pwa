@@ -7,7 +7,7 @@ require('./check-shortcut-sync');
 
 const ROOT = path.join(__dirname, '..');
 const WWW = path.join(ROOT, 'www');
-const FILES = ['index.html', 'data.js', 'manifest.json', 'sw.js', 'sample-course.json', 'install-calendar.html', 'calendar-sync-v1.shortcut', 'calendar-sync-v2.shortcut', 'calendar-sync-v2.1.shortcut'];
+const FILES = ['index.html', 'data.js', 'manifest.json', 'sw.js', 'sample-course.json', 'install-calendar.html', 'calendar-sync-v1.shortcut', 'calendar-sync-v2.shortcut', 'calendar-sync-v2.2.shortcut'];
 /* extract-scrape.js 源在 tools/ 下 */
 const TOOLS_FILES = ['extract-scrape.js'];
 const DIRS = ['icons'];
