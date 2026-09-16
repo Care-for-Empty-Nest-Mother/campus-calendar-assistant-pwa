@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1769aa">
+<title>安装写入系统日历快捷指令</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#f2f6fa;color:#17212b;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif}
+body{display:flex;align-items:center;justify-content:center;padding:24px 18px calc(24px + env(safe-area-inset-bottom))}
+main{width:min(620px,100%);background:#fff;border-radius:24px;padding:28px 22px 24px;box-shadow:0 18px 50px rgba(24,63,98,.13);text-align:center}
+.logo{width:72px;height:72px;border-radius:20px;margin:0 auto 14px;background:linear-gradient(145deg,#2787d4,#125da0);display:grid;place-items:center;color:#fff;font-size:38px;box-shadow:0 10px 24px rgba(23,105,170,.28)}
+h1{font-size:25px;margin:0 0 8px;letter-spacing:-.5px}.lead{margin:0 0 22px;color:#647486;font-size:15px;line-height:1.55}
+.btn{display:block;width:100%;padding:16px 18px;border-radius:15px;background:#1769aa;color:#fff;text-decoration:none;font-size:18px;font-weight:700;-webkit-tap-highlight-color:transparent}
+.btn:active{transform:scale(.985);opacity:.92}.btn.secondary{margin-top:10px;background:#eef5fb;color:#1769aa;font-size:15px;font-weight:600}
+.note{margin:14px 0 0;color:#47647d;font-size:14px;line-height:1.5}.steps{text-align:left;margin:22px 0 0;padding:16px 16px 16px 38px;border-radius:15px;background:#f6f9fc;color:#33485b;font-size:14px;line-height:1.8}
+.steps strong{color:#17212b}.tip{margin:15px 0 0;color:#76879a;font-size:12px;line-height:1.55;word-break:break-all}code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+</style>
+</head>
+<body>
+<main>
+  <div class="logo">📅</div>
+  <h1>安装写入系统日历快捷指令</h1>
+  <p class="lead">只需安装一次。以后在课表页点“同步所选到 iPhone / iPad 日历”，就会自动复制数据并打开这个快捷指令。</p>
+  <a class="btn" id="importBtn" href="shortcuts://import-shortcut?url=https%3A%2F%2Fcare-for-empty-nest-mother.github.io%2Fcampus-calendar-assistant-pwa%2Fcalendar-sync-v1.shortcut&name=%E6%A0%A1%E5%8E%86%E5%B0%8F%E5%8A%A9%E6%89%8B%C2%B7%E5%86%99%E5%85%A5%E7%B3%BB%E7%BB%9F%E6%97%A5%E5%8E%86">一键安装快捷指令</a>
+  <a class="btn secondary" href="calendar-sync-v1.shortcut" download="calendar-sync-v1.shortcut">如果没有自动打开，下载快捷指令文件</a>
+  <p class="note" id="status">正在准备安装链接…</p>
+  <ol class="steps">
+    <li>点击上方按钮，系统会打开 <strong>快捷指令</strong> 的导入页面。</li>
+    <li>确认添加即可，不需要登录 Apple 账号。</li>
+    <li>第一次同步时允许访问日历，之后网页同步只需点一次按钮。</li>
+  </ol>
+  <p class="tip">签名文件 SHA-256 <code>B249E08E49940B7A3E76F2B618D60B78E719C5ADDED9B8FFD652C9A0206DE846</code></p>
+</main>
+<script>
+(function(){
+  var apple=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  var s=document.getElementById('status');
+  if(apple) s.textContent='点击“一键安装快捷指令”，确认添加后即可回到校历小助手。';
+  else s.textContent='请在 iPhone 或 iPad 上打开本页面，才能直接唤起快捷指令 App。';
+})();
+</script>
+</body>
+</html>

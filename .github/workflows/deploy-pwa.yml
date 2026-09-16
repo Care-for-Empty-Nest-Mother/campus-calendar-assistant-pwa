@@ -17,16 +17,16 @@ jobs:
         run: |
           mkdir -p dist
           unzip -q pwa-site-v1.5.2.zip -d dist
-          cp index-v1.5.24.html dist/index.html
+          cp index-v1.6.html dist/index.html
           cp sw.js dist/sw.js
           cp install-ios.html dist/install-ios.html
+          cp install-calendar.html dist/install-calendar.html
+          cp calendar-sync-v1.shortcut dist/calendar-sync-v1.shortcut
           cp extract-course-v4.shortcut dist/extract-course-v4.shortcut
           cp extract-course-v4.zip dist/extract-course-v4.zip
           cp extract-course-v5-unsigned.zip dist/extract-course-v5-unsigned.zip
           cp extract-course-v5.shortcut dist/extract-course-v5.shortcut
           cp extract-course-v7.shortcut dist/extract-course-v7.shortcut
-          cp extract-course-v8.shortcut dist/extract-course-v8.shortcut
-          cp extract-course-v9.shortcut dist/extract-course-v9.shortcut
           cp extract-course-v5.1.shortcut dist/extract-course-v5.1.shortcut
           cp force-update.html dist/force-update.html
           touch dist/.nojekyll
