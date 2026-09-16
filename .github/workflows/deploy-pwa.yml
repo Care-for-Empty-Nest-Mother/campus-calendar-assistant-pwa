@@ -17,7 +17,7 @@ jobs:
         run: |
           mkdir -p dist
           unzip -q pwa-site-v1.5.2.zip -d dist
-          cp index-v1.5.23.html dist/index.html
+          cp index-v1.5.24.html dist/index.html
           cp sw.js dist/sw.js
           cp install-ios.html dist/install-ios.html
           cp extract-course-v4.shortcut dist/extract-course-v4.shortcut
