@@ -2,8 +2,8 @@ from pathlib import Path
 import plistlib
 
 ROOT = Path(__file__).resolve().parent
-OUT = ROOT / 'calendar-sync-v2.xml'
-SHORTCUT_NAME = '校历小助手·同步系统日历 v2'
+OUT = ROOT / 'calendar-sync-v2.1.xml'
+SHORTCUT_NAME = 'calendar-sync-v2.1'
 
 GET_CLIP = 'B2C3D4E0-1111-4A00-8B5A-0F8E2D3C4970'
 TEXT = 'B2C3D4E1-2222-4B11-9C6B-10F9E3D4A081'
@@ -106,7 +106,8 @@ def get_item(uid, name, index):
             'CustomOutputName': name,
             'WFInput': output_attachment('字段', SPLIT_FIELDS),
             'WFItemSpecifier': 'Item At Index',
-            'WFItemIndex': index,
+            # 快捷指令界面中的列表索引从 1 开始。
+            'WFItemIndex': index + 1,
         },
     }
 

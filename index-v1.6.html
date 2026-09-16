@@ -517,13 +517,13 @@ body.preview-mode .preview-only{display:block}
         <button class="btn text-sub" id="calFullClearBtn">清除全部同步（APK）</button>
       </div>
       <div class="calendar-ios-install">
-        <a class="btn text-sub" id="calIosInstallLink" href="install-calendar.html">首次使用 / 升级后：下载并安装“同步系统日历 v2”快捷指令</a>
+        <a class="btn text-sub" id="calIosInstallLink" href="install-calendar.html">首次使用 / 升级后：下载并安装“同步系统日历 v2.1”快捷指令</a>
       </div>
-      <p class="hint" id="calStatus" style="margin-top:8px">APK 可直接写入；iPhone / iPad 安装 v2 快捷指令后，点“同步所选到 iPhone / iPad 日历”即可先清除所选旧日程，再写入新日程。</p>
+      <p class="hint" id="calStatus" style="margin-top:8px">APK 可直接写入；iPhone / iPad 安装 v2.1 快捷指令后，点“同步所选到 iPhone / iPad 日历”即可先清除所选旧日程，再写入新日程。</p>
       <details id="iosCalendarGuide">
         <summary>iPhone / iPad 写入系统日历说明</summary>
-        <p><b>推荐方式：</b>先选择日程类型和日期范围，再点“同步所选到 iPhone / iPad 日历”。网页会把所选日程复制到剪贴板并自动打开 v2 快捷指令；快捷指令会先删除同一类别、同一日期范围内由本助手写入的旧日程，再逐条写入新日程，不需要保存或手动导入 ICS。</p>
-        <p>首次使用或从旧版升级时，先进入安装页下载一次“同步系统日历 v2”；下载后在“文件”App 点击该 .shortcut 文件并确认添加。首次同步时允许访问和删除日历，之后所有同步都只需要在网页点一个按钮。</p>
+        <p><b>推荐方式：</b>先选择日程类型和日期范围，再点“同步所选到 iPhone / iPad 日历”。网页会把所选日程复制到剪贴板并自动打开 v2.1 快捷指令；快捷指令会先删除同一类别、同一日期范围内由本助手写入的旧日程，再逐条写入新日程，不需要保存或手动导入 ICS。</p>
+        <p>首次使用或从旧版升级时，先进入安装页下载一次“同步系统日历 v2.1”；下载后在“文件”App 点击该 .shortcut 文件并确认添加。首次同步时允许访问和删除日历，之后所有同步都只需要在网页点一个按钮。</p>
         <p>课程会按实际周次展开，考试和待办会带提醒；上课提醒按全天事件写入。若 iPad 没有打开快捷指令，请先安装快捷指令 App，再重新点击同步。</p>
         <p>ICS 入口仍保留在“备用”按钮中，作为旧设备或快捷指令不可用时的兜底方式。</p>
       </details>
@@ -2160,9 +2160,9 @@ async function syncToIosCalendar(){
   const copied = await copyCalendarPayload(payload);
   if (!copied){ status.innerHTML = '<div class="err">无法复制日历数据，请允许浏览器访问剪贴板后重试。</div>'; return; }
   status.innerHTML = events.length ? ('已准备清除所选旧日程并写入 <b>' + events.length + '</b> 项日程，正在打开快捷指令…') : '已准备清除所选范围内的旧日程，正在打开快捷指令…';
-  const shortcutName = 'calendar-sync-v2';
+  const shortcutName = 'calendar-sync-v2.1';
   location.href = 'shortcuts://run-shortcut?name=' + encodeURIComponent(shortcutName);
-  setTimeout(() => { status.innerHTML = '若没有自动打开快捷指令，请先点下方安装链接，按页面提示完成 v2 快捷指令安装。'; }, 1500);
+  setTimeout(() => { status.innerHTML = '若没有自动打开快捷指令，请先点下方安装链接，按页面提示完成 v2.1 快捷指令安装。'; }, 1500);
 }
 
 async function exportStoreJson(){
