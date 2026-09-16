@@ -1,5 +1,5 @@
 /* 校历小助手 Service Worker：只缓存应用壳，绝对不能用 index.html 替代文件下载。 */
-const CACHE = 'xpu-keli-v7';
+const CACHE = 'xpu-keli-v8';
 const ASSETS = [
   './',
   './index.html',
