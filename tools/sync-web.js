@@ -2,6 +2,9 @@
 const fs = require('fs');
 const path = require('path');
 
+/* 在同步前校验快捷指令名称，避免网页与安装文件错位。 */
+require('./check-shortcut-sync');
+
 const ROOT = path.join(__dirname, '..');
 const WWW = path.join(ROOT, 'www');
 const FILES = ['index.html', 'data.js', 'manifest.json', 'sw.js', 'sample-course.json', 'install-calendar.html', 'calendar-sync-v1.shortcut', 'calendar-sync-v2.shortcut', 'calendar-sync-v2.1.shortcut'];

@@ -13,6 +13,8 @@ jobs:
     environment: github-pages
     steps:
       - uses: actions/checkout@v4
+      - name: Verify shortcut sync names
+        run: node tools/check-shortcut-sync.js
       - name: Extract PWA
         run: |
           mkdir -p dist
@@ -23,6 +25,7 @@ jobs:
           cp install-calendar.html dist/install-calendar.html
           cp calendar-sync-v1.shortcut dist/calendar-sync-v1.shortcut
           cp calendar-sync-v2.shortcut dist/calendar-sync-v2.shortcut
+          cp calendar-sync-v2.1.shortcut dist/calendar-sync-v2.1.shortcut
           cp extract-course-v4.shortcut dist/extract-course-v4.shortcut
           cp extract-course-v4.zip dist/extract-course-v4.zip
           cp extract-course-v5-unsigned.zip dist/extract-course-v5-unsigned.zip
