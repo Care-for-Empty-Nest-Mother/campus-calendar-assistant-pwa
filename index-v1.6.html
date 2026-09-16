@@ -93,6 +93,12 @@ main{max-width:var(--layout-max);margin:0 auto;padding:12px var(--layout-gutter)
 .pwa-install-tip .pwa-install-copy{flex:1;min-width:0}
 .pwa-install-tip b{display:block;font-size:15px;margin-bottom:2px}
 .pwa-install-tip small{display:block;color:var(--sub);font-size:13px}
+.pwa-transfer-card{border:1px solid var(--blue);background:linear-gradient(135deg,var(--blue-l),var(--card))}
+.pwa-transfer-card .pwa-transfer-copy{line-height:1.55;color:var(--sub);font-size:13px;margin:0 0 10px}
+.pwa-transfer-card .btn{width:100%}
+.pwa-transfer-card .pwa-transfer-restore-hint{margin:8px 0 0}
+.pwa-transfer-fallback{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.pwa-transfer-fallback textarea{width:100%;min-height:110px;resize:vertical;font-size:13px;line-height:1.45}
 
 /* ---- 通用行/列表 ---- */
 .row-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--sep-soft)}
@@ -533,6 +539,18 @@ body.preview-mode .preview-only{display:block}
   <!-- 课表 -->
   <section class="tab-page" id="page-courses">
     <div id="courseImportMain">
+    <div class="card pwa-transfer-card" id="pwaTransferCard" hidden>
+      <div class="card-head"><h2 id="pwaTransferTitle">主屏幕版课表迁移</h2></div>
+      <p class="pwa-transfer-copy" id="pwaTransferDesc"></p>
+      <button class="btn primary" id="pwaTransferCopyBtn" type="button" hidden>复制课表到主屏幕版</button>
+      <button class="btn primary" id="pwaTransferRestoreBtn" type="button" hidden>从剪贴板恢复课表</button>
+      <p class="hint pwa-transfer-restore-hint" id="pwaTransferRestoreHint" hidden>第二步：回到桌面打开“校历小助手”，在课表页点“从剪贴板恢复课表”。</p>
+      <div id="pwaTransferMsg"></div>
+      <div class="pwa-transfer-fallback" id="pwaTransferFallback" hidden>
+        <textarea class="text-input" id="pwaTransferPaste" placeholder="长按此处粘贴刚复制的迁移数据"></textarea>
+        <button class="btn" id="pwaTransferParseBtn" type="button">解析粘贴内容</button>
+      </div>
+    </div>
     <div class="card">
       <div class="card-head"><h2>课表导入 <span class="tag" id="coursePageVersion">v1.6</span></h2></div>
       <p class="hint">支持 JSON 文件或粘贴导入，兼容常见课表格式。</p>
@@ -869,8 +887,12 @@ function renderTodayCourses(info){
   const box = $('#todayCourses'), nb = $('#nextClassBox');
   nb.textContent = '';
   if (!store || !store.courses.length){
-    box.innerHTML = '<div class="empty-box">尚未导入课表<div class="tip-line">导入后显示今日课程</div></div>' +
-      '<div class="btn-row"><button class="btn primary" data-goto="courses">导入课表</button></div>';
+    const canRestore = isIosStandalonePwa();
+    const restoreBtn = canRestore ? '<button class="btn primary" data-pwa-transfer>从 Safari 恢复课表</button>' : '';
+    const importClass = canRestore ? 'btn' : 'btn primary';
+    const emptyTip = canRestore ? 'Safari 中已导入？点“从 Safari 恢复课表”' : '导入后显示今日课程';
+    box.innerHTML = '<div class="empty-box">尚未导入课表<div class="tip-line">' + emptyTip + '</div></div>' +
+      '<div class="btn-row"><button class="' + importClass + '" data-goto="courses">导入课表</button>' + restoreBtn + '</div>';
     return;
   }
   if (info.state !== 'teaching'){
@@ -1040,6 +1062,7 @@ function renderCourses(){
   const ws = addDays(pd(sem.startDate), (w - 1) * 7);
   $('#ttWeekRange').textContent = fmtShort(ws) + ' ~ ' + fmtShort(addDays(ws, 6));
   renderTT(w);
+  syncPwaTransferUi();
 }
 
 function renderTT(w){
@@ -2945,10 +2968,157 @@ function applyTheme(){
   if (m) m.content = (t === 'dark') ? '#000000' : '#F5F5F7';
 }
 
+/* ================= Safari / 主屏幕 PWA 数据迁移 ================= */
+const PWA_TRANSFER_PREFIX = 'XPU_APP_TRANSFER_V1:';
+
+function isIosStandalonePwa(){
+  if (!isAppleMobile() || isNativeApp()) return false;
+  return window.navigator.standalone === true ||
+    !!(window.matchMedia && matchMedia('(display-mode: standalone)').matches);
+}
+function appDataSnapshot(){
+  return {
+    app: 'xpu-keli-backup',
+    version: 2,
+    exportedAt: new Date().toISOString(),
+    store: store ? JSON.parse(JSON.stringify(store)) : null,
+    courses: store && Array.isArray(store.courses) ? JSON.parse(JSON.stringify(store.courses)) : [],
+    exams: JSON.parse(JSON.stringify(EXAMS || [])),
+    todos: JSON.parse(JSON.stringify(TODOS || [])),
+    settings: JSON.parse(JSON.stringify(settings || {})),
+    shortcutPending: shortcutPending ? JSON.parse(JSON.stringify(shortcutPending)) : null
+  };
+}
+function pwaTransferDataText(){
+  return PWA_TRANSFER_PREFIX + JSON.stringify(appDataSnapshot());
+}
+function parsePwaTransferText(text){
+  let raw = String(text || '').trim();
+  if (raw.charCodeAt(0) === 0xFEFF) raw = raw.slice(1).trim();
+  if (raw.charAt(0) === '"' && raw.charAt(raw.length - 1) === '"'){
+    try { const unwrapped = JSON.parse(raw); if (typeof unwrapped === 'string') raw = unwrapped.trim(); } catch(e){}
+  }
+  if (raw.indexOf(PWA_TRANSFER_PREFIX) === 0) raw = raw.slice(PWA_TRANSFER_PREFIX.length);
+  let data = null;
+  try { data = JSON.parse(raw); } catch(e) { throw new Error('剪贴板中没有可恢复的校历助手数据'); }
+  if (!data || data.app !== 'xpu-keli-backup') throw new Error('剪贴板内容不是校历小助手的迁移数据');
+  return data;
+}
+function applyAppDataSnapshot(data, options){
+  if (!data || data.app !== 'xpu-keli-backup') throw new Error('不是有效的校历小助手数据');
+  const incomingStore = data.store && Array.isArray(data.store.courses)
+    ? data.store
+    : (Array.isArray(data.courses) ? { importedAt: iso(today()), meta:{}, courses: data.courses } : null);
+  if (incomingStore && incomingStore.courses.length){
+    store = JSON.parse(JSON.stringify(incomingStore));
+    store.courses.forEach(c => { if (!Array.isArray(c.weeks)) c.weeks = []; });
+    saveStore();
+  }
+  if (Array.isArray(data.exams)){ EXAMS = JSON.parse(JSON.stringify(data.exams)); saveExams(); }
+  if (Array.isArray(data.todos)){ TODOS = JSON.parse(JSON.stringify(data.todos)); saveTodos(); }
+  if (data.settings && typeof data.settings === 'object'){ Object.assign(settings, data.settings); saveSettings(); }
+  if (data.shortcutPending && data.shortcutPending.info && Array.isArray(data.shortcutPending.info.rows)){
+    shortcutPending = JSON.parse(JSON.stringify(data.shortcutPending)); saveShortcutPendingData();
+  }
+  normalizeStoredCourseSections();
+  refreshCourseOptions();
+  renderCourses();
+  renderTodayCourses(activeInfo());
+  renderExams();
+  renderTodos();
+  renderNextExam();
+  renderNextClass();
+  applyTheme();
+  syncShortcutPendingUi();
+  syncPwaTransferUi();
+  scheduleNativeReminders();
+  const n = store && store.courses ? store.courses.length : 0;
+  if (!options || !options.quiet) toast('已恢复 ' + n + ' 门课程及配套数据');
+  return n;
+}
+function setPwaTransferMessage(html, isError){
+  const msg = $('#pwaTransferMsg');
+  if (msg) msg.innerHTML = html ? '<div class="' + (isError ? 'err' : 'ok') + '">' + html + '</div>' : '';
+}
+function showPwaTransferFallback(reason){
+  const card = $('#pwaTransferCard');
+  if (card) card.hidden = false;
+  const fallback = $('#pwaTransferFallback'); if (fallback) fallback.hidden = false;
+  const paste = $('#pwaTransferPaste');
+  if (paste) paste.focus();
+  setPwaTransferMessage('无法自动读取剪贴板：' + esc(reason || '未知错误') + '。请在下方长按粘贴刚刚复制的数据。', true);
+}
+async function copyPwaTransferData(){
+  const ok = await copyText(pwaTransferDataText());
+  if (!ok){
+    showPwaTransferFallback('复制失败，请长按文本框手动复制');
+    return false;
+  }
+  setPwaTransferMessage('<b>已复制课表。</b>现在返回桌面，打开“校历小助手”，在课表页点“从剪贴板恢复课表”。', false);
+  const btn = $('#pwaTransferCopyBtn'); if (btn) btn.textContent = '已复制，返回桌面打开校历小助手';
+  const hint = $('#pwaTransferRestoreHint'); if (hint) hint.hidden = false;
+  toast('课表已复制，可到主屏幕版恢复');
+  return true;
+}
+async function restorePwaTransferData(options){
+  const opts = options || {};
+  try {
+    if (!navigator.clipboard || !navigator.clipboard.readText) throw new Error('当前浏览器不支持读取剪贴板');
+    const text = await navigator.clipboard.readText();
+    const data = parsePwaTransferText(text);
+    const n = applyAppDataSnapshot(data, { quiet: !!opts.auto });
+    if (!opts.auto){
+      switchTab('courses');
+      toast('已从剪贴板恢复课表：' + n + ' 门课程');
+    }
+    return true;
+  } catch(e){
+    if (!opts.auto){
+      switchTab('courses');
+      showPwaTransferFallback(e.message || String(e));
+    }
+    return false;
+  }
+}
+function parsePwaTransferPaste(){
+  try {
+    const raw = $('#pwaTransferPaste') ? $('#pwaTransferPaste').value : '';
+    const data = parsePwaTransferText(raw);
+    const n = applyAppDataSnapshot(data);
+    toast('恢复完成：' + n + ' 门课程');
+  } catch(e){
+    showPwaTransferFallback(e.message || String(e));
+  }
+}
+function syncPwaTransferUi(){
+  const card = $('#pwaTransferCard');
+  if (!card) return;
+  const ios = isAppleMobile() && !isNativeApp();
+  const standalone = isIosStandalonePwa();
+  const hasCourses = !!(store && Array.isArray(store.courses) && store.courses.length);
+  const mode = !ios ? '' : (standalone && !hasCourses ? 'restore' : (!standalone && hasCourses ? 'copy' : ''));
+  card.hidden = !mode;
+  if (!mode) return;
+  const title = $('#pwaTransferTitle'), desc = $('#pwaTransferDesc');
+  const copyBtn = $('#pwaTransferCopyBtn'), restoreBtn = $('#pwaTransferRestoreBtn');
+  if (copyBtn) copyBtn.hidden = mode !== 'copy';
+  if (restoreBtn) restoreBtn.hidden = mode !== 'restore';
+  const fallback = $('#pwaTransferFallback'); if (fallback) fallback.hidden = true;
+  const hint = $('#pwaTransferRestoreHint'); if (hint) hint.hidden = true;
+  if (mode === 'copy'){
+    if (title) title.textContent = '让主屏幕版显示已导入课表';
+    if (desc) desc.innerHTML = 'Safari 与主屏幕版的数据彼此独立。点下面按钮复制后，返回桌面打开“校历小助手”，再点一次即可恢复。';
+    setPwaTransferMessage('', false);
+  } else {
+    if (title) title.textContent = '恢复 Safari 中已导入的课表';
+    if (desc) desc.innerHTML = '如果刚才已在 Safari 点过“复制课表到主屏幕版”，点下面按钮即可恢复。';
+    setPwaTransferMessage('', false);
+  }
+}
+
 /* ================= 数据备份与恢复 ================= */
 function backupAll(){
-  const data = { app: 'xpu-keli-backup', version: 1, exportedAt: iso(today()),
-    courses: store ? store.courses : [], exams: EXAMS, todos: TODOS, settings: settings };
+  const data = appDataSnapshot();
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -2963,16 +3133,7 @@ function restoreBackup(file){
     try {
       const data = JSON.parse(reader.result);
       if (data.app !== 'xpu-keli-backup') throw new Error('不是本应用导出的备份文件');
-      if (Array.isArray(data.courses) && data.courses.length){
-        store = { importedAt: iso(today()), meta: (store && store.meta) || {}, courses: data.courses };
-        store.courses.forEach(c => { if (!Array.isArray(c.weeks)) c.weeks = []; });
-        saveStore();
-      }
-      if (Array.isArray(data.exams)){ EXAMS = data.exams; saveExams(); }
-      if (Array.isArray(data.todos)){ TODOS = data.todos; saveTodos(); }
-      if (data.settings){ Object.assign(settings, data.settings); saveSettings(); applyTheme(); }
-      renderCourses(); renderTodayCourses(activeInfo()); renderExams(); renderTodos(); renderNextExam();
-      toast('备份恢复完成');
+      applyAppDataSnapshot(data);
     } catch(e){ toast('恢复失败：' + e.message); }
   };
   reader.readAsText(file, 'utf-8');
@@ -3206,7 +3367,12 @@ function init(){
   const shortcutDiscardBtn = $('#shortcutDiscardBtn'); if (shortcutDiscardBtn) shortcutDiscardBtn.onclick = () => { clearShortcutPending(); clearHtmlPreviews(); closeShortcutResultPage(true); toast('已丢弃快捷指令提取结果'); };
   const shortcutClipReadBtn = $('#shortcutClipboardReadBtn'); if (shortcutClipReadBtn) shortcutClipReadBtn.onclick = () => readShortcutClipboard(false);
   const shortcutClipParseBtn = $('#shortcutClipboardParseBtn'); if (shortcutClipParseBtn) shortcutClipParseBtn.onclick = parseShortcutClipboardPaste;
+  const pwaTransferCopyBtn = $('#pwaTransferCopyBtn'); if (pwaTransferCopyBtn) pwaTransferCopyBtn.onclick = copyPwaTransferData;
+  const pwaTransferRestoreBtn = $('#pwaTransferRestoreBtn'); if (pwaTransferRestoreBtn) pwaTransferRestoreBtn.onclick = () => restorePwaTransferData();
+  const pwaTransferParseBtn = $('#pwaTransferParseBtn'); if (pwaTransferParseBtn) pwaTransferParseBtn.onclick = parsePwaTransferPaste;
   document.addEventListener('click', e => {
+    const transferTrigger = e.target.closest('[data-pwa-transfer]');
+    if (transferTrigger){ e.preventDefault(); restorePwaTransferData(); return; }
     const g = e.target.closest('[data-goto]');
     if (g) switchTab(g.dataset.goto);
     const el = e.target.closest('[data-ci]');
@@ -3418,6 +3584,10 @@ function init(){
   renderNextClass();
   tickReminder();
   scheduleNativeReminders();
+  syncPwaTransferUi();
+  if (isIosStandalonePwa() && (!store || !store.courses.length)){
+    setTimeout(() => restorePwaTransferData({ auto:true }), 700);
+  }
   setInterval(refreshNow, 30000);
   setInterval(tickReminder, 20000);
 
