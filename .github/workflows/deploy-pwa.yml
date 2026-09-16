@@ -22,6 +22,7 @@ jobs:
           cp install-ios.html dist/install-ios.html
           cp install-calendar.html dist/install-calendar.html
           cp calendar-sync-v1.shortcut dist/calendar-sync-v1.shortcut
+          cp calendar-sync-v2.shortcut dist/calendar-sync-v2.shortcut
           cp extract-course-v4.shortcut dist/extract-course-v4.shortcut
           cp extract-course-v4.zip dist/extract-course-v4.zip
           cp extract-course-v5-unsigned.zip dist/extract-course-v5-unsigned.zip

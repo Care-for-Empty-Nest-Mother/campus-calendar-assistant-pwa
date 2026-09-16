@@ -179,6 +179,8 @@ a.btn{display:inline-flex;align-items:center;justify-content:center;text-decorat
 .sync-range{display:flex;align-items:center;gap:7px;margin-top:10px}
 .sync-range input{flex:1;min-width:0;border:1px solid var(--sep);border-radius:10px;padding:9px 8px;background:var(--card);color:var(--txt);font-size:14px}
 .sync-range span{font-size:12px;color:var(--sub);flex:none}
+.calendar-ios-install{display:flex;margin-top:8px}
+.calendar-ios-install .btn{flex:1;text-align:center;text-decoration:none}
 .meta-line{display:flex;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--sub);margin-bottom:12px}
 .meta-line .m{background:var(--fill);border-radius:var(--pill);padding:3px 10px}
 .meta-line .m.warn{color:var(--orange)}
@@ -402,7 +404,7 @@ body.preview-mode .preview-only{display:block}
   <div class="inner">
     <div class="brand compact">
       <h1>校历小助手</h1>
-      <p>西安石油大学<span class="version-label">v1.5.24</span></p>
+      <p>西安石油大学<span class="version-label">v1.6</span></p>
     </div>
     <div class="sem-chip" id="semChip">加载中</div>
   </div>
@@ -508,17 +510,22 @@ body.preview-mode .preview-only{display:block}
         <input type="date" id="syncEndDate" aria-label="同步结束日期">
       </div>
       <div class="btn-row">
+        <button class="btn primary" id="calIosWriteBtn">同步所选到 iPhone / iPad 日历</button>
         <button class="btn primary" id="calWriteBtn">同步所选（APK）</button>
-        <button class="btn" id="calExportIcsBtn">导出到 iPhone / iPad 日历</button>
-        <button class="btn text-danger" id="calClearBtn">清除所选</button>
-        <button class="btn text-sub" id="calFullClearBtn">清除全部同步</button>
+        <button class="btn" id="calExportIcsBtn">备用：导出 ICS 文件</button>
+        <button class="btn text-danger" id="calClearBtn">清除所选（APK）</button>
+        <button class="btn text-sub" id="calFullClearBtn">清除全部同步（APK）</button>
       </div>
-      <p class="hint" id="calStatus" style="margin-top:8px">APK 可直接写入；iPhone / iPad 可导出系统日历文件。</p>
+      <div class="calendar-ios-install">
+        <a class="btn text-sub" id="calIosInstallLink" href="install-calendar.html">首次使用 / 升级后：一键安装“同步系统日历 v2”快捷指令</a>
+      </div>
+      <p class="hint" id="calStatus" style="margin-top:8px">APK 可直接写入；iPhone / iPad 安装 v2 快捷指令后，点“同步所选到 iPhone / iPad 日历”即可先清除所选旧日程，再写入新日程。</p>
       <details id="iosCalendarGuide">
         <summary>iPhone / iPad 写入系统日历说明</summary>
-        <p>先选择日程类型和日期范围，再点“导出到 iPhone / iPad 日历”。在分享面板中选择“日历”，或存储到“文件”后打开，系统会一次性加入所选日程。</p>
-        <p>课程会按周重复，并携带课前提醒；考试和待办也会生成带提醒的日程。这样即使 Safari 或 PWA 关闭，提醒仍由苹果系统日历负责。</p>
-        <p>快捷指令还能替代网页提取、打开教务系统、添加单项日程或提醒；批量课表优先使用本页导出的日历文件，更稳定。</p>
+        <p><b>推荐方式：</b>先选择日程类型和日期范围，再点“同步所选到 iPhone / iPad 日历”。网页会把所选日程复制到剪贴板并自动打开 v2 快捷指令；快捷指令会先删除同一类别、同一日期范围内由本助手写入的旧日程，再逐条写入新日程，不需要保存或手动导入 ICS。</p>
+        <p>首次使用或从旧版升级时，需要点一次“一键安装‘同步系统日历 v2’快捷指令”；首次同步时 iOS 会请求日历权限，允许一次即可。之后所有同步都只需要在网页点一个按钮。</p>
+        <p>课程会按实际周次展开，考试和待办会带提醒；上课提醒按全天事件写入。若 iPad 没有打开快捷指令，请先安装快捷指令 App，再重新点击同步。</p>
+        <p>ICS 入口仍保留在“备用”按钮中，作为旧设备或快捷指令不可用时的兜底方式。</p>
       </details>
     </div>
   </section>
@@ -527,7 +534,7 @@ body.preview-mode .preview-only{display:block}
   <section class="tab-page" id="page-courses">
     <div id="courseImportMain">
     <div class="card">
-      <div class="card-head"><h2>课表导入 <span class="tag" id="coursePageVersion">v1.5.24</span></h2></div>
+      <div class="card-head"><h2>课表导入 <span class="tag" id="coursePageVersion">v1.6</span></h2></div>
       <p class="hint">支持 JSON 文件或粘贴导入，兼容常见课表格式。</p>
       <div class="btn-row">
         <button class="btn primary" id="importFileBtn">导入 JSON 文件</button>
@@ -616,7 +623,7 @@ body.preview-mode .preview-only{display:block}
     <section class="card shortcut-result-page" id="shortcutResultPage" hidden>
       <div class="card-head shortcut-result-top">
         <div class="shortcut-result-heading">
-          <h2>快捷指令提取结果 <span class="tag" id="shortcutResultVersion">v1.5.24</span></h2>
+          <h2>快捷指令提取结果 <span class="tag" id="shortcutResultVersion">v1.6</span></h2>
           <p class="hint" id="shortcutResultMeta">快捷指令结果会固定保存在这里，核对前不会丢失。</p>
         </div>
         <button class="btn" id="shortcutResultBackBtn" type="button">返回</button>
@@ -635,7 +642,7 @@ body.preview-mode .preview-only{display:block}
     </section>
   </section>
 
-<div class="footer apk-download-footer"><a class="apk-download-link" href="downloads/campus-calendar-v1.5.apk">下载 Android APK · v1.5</a></div>
+<div class="footer apk-download-footer"><a class="apk-download-link" href="downloads/campus-calendar-v1.6.apk">下载 Android APK · v1.6</a></div>
 </main>
 
 
@@ -704,7 +711,7 @@ body.preview-mode .preview-only{display:block}
 const D = window.XPU_DATA;
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
-const APP_VERSION = '1.5.24';
+const APP_VERSION = '1.6';
 const PREVIEW_MODE = new URLSearchParams(location.search).get('mockNative') === '1' || new URLSearchParams(location.search).get('preview') === '1';
 const UI_NOTES_KEY = 'xpu_ui_notes_v1';
 
@@ -2062,6 +2069,102 @@ async function exportScheduleIcs(){
     status.textContent = '已取消导出';
   }
 }
+
+function isAppleMobile(){
+  const ua = navigator.userAgent || '';
+  return /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+function shortcutField(value){
+  return String(value == null ? '' : value).replace(/\r?\n/g, ' ').replace(/\|/g, '｜').trim();
+}
+function shortcutDateTime(d){
+  return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()) + ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+}
+function shortcutDateOnly(d){
+  return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+}
+function shortcutMarker(category){
+  return '[校历小助手:schedule:' + shortcutField(category || 'other') + ']';
+}
+function buildShortcutCalendarEvents(options){
+  const evs = [];
+  const cats = new Set((options && options.categories) || []);
+  const start = (options && options.start) || '0000-01-01';
+  const end = (options && options.end) || '9999-12-31';
+  if (cats.has('course') && store && store.courses.length){
+    for (const sem of D.semesters){
+      for (const c of store.courses){
+        const weeks = c.weeks.filter(w => w >= 1 && w <= sem.weeks && inSyncRange(iso(courseDate(sem, c, w)), start, end)).sort((a,b) => a-b);
+        for (const week of weeks){
+          const begin = courseDate(sem, c, week);
+          const bt = timeOf(c, 'start').split(':');
+          begin.setHours(+bt[0], +bt[1], 0, 0);
+          const durMin = Math.max(15, timeMin(c, 'end') - timeMin(c, 'start'));
+          evs.push({
+            kind:'soon', category:'course', title:c.name, location:c.room || '',
+            desc:[c.teacher, '第' + week + '周', '第' + c.startSection + '-' + c.endSection + '节', sem.short || ''].filter(Boolean).join(' · '),
+            beginMillis:begin.getTime(), durationMillis:durMin * 60000
+          });
+        }
+      }
+    }
+  }
+  const other = buildScheduleEvents({ categories:(options.categories || []).filter(c => c !== 'course'), start, end });
+  for (const ev of other){
+    evs.push(Object.assign({}, ev, { kind: ev.allDay ? 'allday' : ((ev.category === 'exam' || ev.category === 'todo') ? 'day' : 'soon') }));
+  }
+  return evs.sort((a,b) => a.beginMillis - b.beginMillis || String(a.title).localeCompare(String(b.title), 'zh-CN'));
+}
+function buildShortcutCalendarPayload(events, options){
+  const cats = ((options && options.categories) || []).filter(Boolean);
+  const rangeStart = ((options && options.start) || '0000-01-01') + ' 00:00';
+  const rangeEnd = ((options && options.end) || '9999-12-31') + ' 23:59';
+  const lines = [];
+  cats.forEach(category => {
+    lines.push(['CLEAR', rangeStart, rangeEnd, '-', '-', '-', '-', category, shortcutMarker(category)].map(shortcutField).join('|'));
+  });
+  events.forEach(ev => {
+    const begin = new Date(ev.beginMillis);
+    const end = ev.durationMillis ? new Date(ev.beginMillis + ev.durationMillis) : begin;
+    const startText = ev.allDay ? shortcutDateOnly(begin) : shortcutDateTime(begin);
+    const endText = ev.allDay ? shortcutDateOnly(begin) : shortcutDateTime(end);
+    const category = ev.category || 'other';
+    const marker = shortcutMarker(category);
+    const notes = [ev.desc, marker].filter(Boolean).join(' · ');
+    lines.push([
+      'WRITE', startText, endText, ev.title, ev.location, notes, ev.kind, category, marker
+    ].map(shortcutField).join('|'));
+  });
+  return lines.join('\n');
+}
+async function copyCalendarPayload(text){
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch(e){}
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.setAttribute('readonly',''); ta.style.position = 'fixed'; ta.style.left = '-9999px';
+    document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, ta.value.length);
+    const ok = document.execCommand('copy'); ta.remove(); return ok;
+  } catch(e){ return false; }
+}
+async function syncToIosCalendar(){
+  const status = $('#calStatus');
+  const options = selectedSyncOptions();
+  if (options.error){ status.innerHTML = '<div class="err">' + esc(options.error) + '</div>'; return; }
+  const events = buildShortcutCalendarEvents(options);
+  const payload = buildShortcutCalendarPayload(events, options);
+  const copied = await copyCalendarPayload(payload);
+  if (!copied){ status.innerHTML = '<div class="err">无法复制日历数据，请允许浏览器访问剪贴板后重试。</div>'; return; }
+  status.innerHTML = events.length ? ('已准备清除所选旧日程并写入 <b>' + events.length + '</b> 项日程，正在打开快捷指令…') : '已准备清除所选范围内的旧日程，正在打开快捷指令…';
+  const shortcutName = '校历小助手·同步系统日历 v2';
+  location.href = 'shortcuts://run-shortcut?name=' + encodeURIComponent(shortcutName);
+  setTimeout(() => { status.innerHTML = '若没有自动打开快捷指令，请先点下方“一键安装”，然后重新点同步。'; }, 1500);
+}
+
 async function exportStoreJson(){
   if (!store || !store.courses.length){ toast('当前没有可导出的课表'); return; }
   if (await saveJsonFile(exportCoursesPayload(store.courses), '校历小助手-课表-' + iso(today()) + '.json')) toast('课表 JSON 已导出');
@@ -3262,6 +3365,8 @@ function init(){
   const calendarWriteBtn = $('#calWriteBtn');
   const calendarExportIcsBtn = $('#calExportIcsBtn');
   const calendarClearBtn = $('#calClearBtn');
+  const calendarIosWriteBtn = $('#calIosWriteBtn');
+  if (calendarIosWriteBtn) calendarIosWriteBtn.onclick = syncToIosCalendar;
   if (calendarWriteBtn) calendarWriteBtn.onclick = calWrite;
   if (calendarExportIcsBtn) calendarExportIcsBtn.onclick = exportScheduleIcs;
   if (calendarClearBtn) calendarClearBtn.onclick = calClear;
@@ -3288,6 +3393,10 @@ function init(){
   $('#modal').addEventListener('click', ev => { if (ev.target.id === 'modal') closeModal('modal'); });
 
   /* 渲染与启动 */
+  const apkFooter = document.querySelector('.apk-download-footer');
+  if (apkFooter && isNativeApp()) apkFooter.hidden = true;
+  if (!isAppleMobile() || isNativeApp()){ const b = $('#calIosWriteBtn'); if (b) b.hidden = true; const l = $('#calIosInstallLink'); if (l) l.parentElement.hidden = true; }
+  if (!isNativeApp()){ const b = $('#calWriteBtn'); if (b) b.hidden = true; }
   if (new URLSearchParams(location.search).get('install') === '1') switchTab('courses');
   applyTheme();
   syncShortcutPendingUi();
